@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_dieta"
+        android:icon="@drawable/ic_dieta"
+        android:title="Dieta" />
+
+    <!--<item
+        android:id="@+id/navigation_notas"
+        android:icon="@drawable/notas"
+        android:title="Notas" />-->
+
+    <item
+        android:id="@+id/navigation_estadistica"
+        android:icon="@drawable/ic_stats"
+        android:title="Estadistica" />
+
+</menu>
