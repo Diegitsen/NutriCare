@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="5dp"
+        android:text="Agregar Alimento"
+        android:textSize="25sp"
+        android:textStyle="bold"/>
+
+    <EditText
+        android:id="@+id/etNombre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:hint="Nombre"
+        android:singleLine="true"/>
+
+    <EditText
+        android:id="@+id/etInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:ems="10"
+        android:hint="Info"
+        android:singleLine="true"/>
+
+
+    <RadioGroup
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp">
+
+        <RadioButton
+            android:id="@+id/rbFruta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fruta"
+            android:layout_marginRight="20dp"/>
+
+        <RadioButton
+            android:id="@+id/rbVerdura"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Verdura"
+            android:layout_marginLeft="20dp"/>
+
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/bAgregar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@color/colorAccent"
+        android:text="Agregar"
+        android:textColor="@android:color/white" />
+</LinearLayout>

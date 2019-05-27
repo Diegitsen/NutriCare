@@ -1,15 +1,37 @@
 package com.example.nutricare;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 
 /**
@@ -20,7 +42,8 @@ import android.widget.Toast;
  * Use the {@link DietaFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class DietaFragment extends Fragment {
+public class DietaFragment extends Fragment implements Response.Listener<JSONObject>,
+        Response.ErrorListener{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -33,6 +56,20 @@ public class DietaFragment extends Fragment {
     FloatingActionButton floatingActionButton;
 
     private OnFragmentInteractionListener mListener;
+
+
+    RecyclerView recyclerView;
+    ArrayList<Alimento> listaAlimentos;
+
+    ProgressDialog progressDialog;
+
+    RequestQueue request;
+    JsonObjectRequest jsonObjectRequest;
+
+    FloatingActionButton bAgregar;
+
+    private int nService = 0;
+
 
     public DietaFragment() {
         // Required empty public constructor
@@ -72,7 +109,82 @@ public class DietaFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_dieta, container, false);
 
+        listaAlimentos = new ArrayList<>();
+
+        recyclerView = v.findViewById(R.id.idRecycler);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
+        recyclerView.setHasFixedSize(true);
+        bAgregar = v.findViewById(R.id.add_fab);
+
+
+        request = Volley.newRequestQueue(getContext());
+
+        cargarWebService();
+
+        bAgregar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                agregarAlimento();
+            }
+        });
+
         return v;
+    }
+
+
+    private void agregarAlimento()
+    {
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(getActivity());
+        View mView = getLayoutInflater().inflate(R.layout.dialog_agregar_alimento, null);
+        final EditText aNombre = (EditText) mView.findViewById(R.id.etNombre);
+        final EditText aInfo = (EditText) mView.findViewById(R.id.etInfo);
+        final RadioButton rbFruta = mView.findViewById(R.id.rbFruta);
+        final RadioButton rbVerdura = mView.findViewById(R.id.rbVerdura);
+        Button aAgregar = (Button) mView.findViewById(R.id.bAgregar);
+
+        mBuilder.setView(mView);
+        final AlertDialog dialog = mBuilder.create();
+        dialog.show();
+        aAgregar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+               if(rbFruta.isChecked())
+                   cargarWebService2(aNombre.getText().toString(),1 ,aInfo.getText().toString());
+
+               else if(rbVerdura.isChecked())
+                    cargarWebService2(aNombre.getText().toString(),2,aInfo.getText().toString());
+
+               dialog.dismiss();
+            }
+        });
+    }
+
+    private void cargarWebService()
+    {
+        nService = 1;
+
+        progressDialog = new ProgressDialog(getContext());
+        progressDialog.setMessage("Consultado...");
+        progressDialog.show();
+
+        String url = "https://nutricareapp.000webhostapp.com/consultarAlimentos.php";
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, this, this);
+        request.add(jsonObjectRequest);
+    }
+
+    private void cargarWebService2(String nombre, Integer tipo, String info)
+    {
+        nService = 2;
+        String url = "https://nutricareapp.000webhostapp.com/agregarAlimento.php?nombre=" + nombre
+                + "&tipo=" + tipo + "&info=" + info;
+
+        url = url.replace(" ", "%20");
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, this, this);
+        request.add(jsonObjectRequest);
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -97,6 +209,69 @@ public class DietaFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onErrorResponse(VolleyError error) {
+
+        if(nService==1)
+        {
+            progressDialog.hide();
+            Toast.makeText(getContext(), "No se pudo conectar" , Toast.LENGTH_SHORT).show();
+        }
+        else if(nService == 2)
+        {
+            progressDialog.hide();
+            Toast.makeText(getContext(), "No se pudo agregar el alimento" , Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    @Override
+    public void onResponse(JSONObject response)
+    {
+        if(nService==1)
+        {
+            Alimento alimento = null;
+
+            JSONArray json = response.optJSONArray("Alimento");
+
+            try{
+                for(int i = 0; i < json.length(); i++)
+                {
+                    alimento = new Alimento();
+                    JSONObject jsonObject = null;
+                    jsonObject = json.getJSONObject(i);
+
+                    alimento.setNombre(jsonObject.optString("nombre"));
+                    alimento.setInfo(jsonObject.optString("info"));
+                    alimento.setTipo(jsonObject.optInt("tipo"));
+
+                    listaAlimentos.add(alimento);
+
+                }
+                progressDialog.hide();
+
+                AlimentoAdapter adapter = new AlimentoAdapter(listaAlimentos);
+
+                recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
+
+                recyclerView.setAdapter(adapter);
+
+            }catch (JSONException e)
+            {
+                e.printStackTrace();
+                Toast.makeText(getContext(), "No se ha podido conectar con el servidor", Toast.LENGTH_SHORT).show();
+                progressDialog.hide();
+            }
+        }
+        else if(nService==2)
+        {
+            progressDialog.hide();
+            Toast.makeText(getActivity(), "Se ha agregado exitosamente", Toast.LENGTH_SHORT).show();
+        }
+
+
     }
 
     /**
