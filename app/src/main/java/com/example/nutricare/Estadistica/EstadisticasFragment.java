@@ -1,4 +1,4 @@
-package com.example.nutricare;
+package com.example.nutricare.Estadistica;
 
 import android.content.Context;
 import android.net.Uri;
@@ -7,7 +7,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+
+import com.example.nutricare.R;
 
 
 /**

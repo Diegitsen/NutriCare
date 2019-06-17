@@ -1,4 +1,4 @@
-package com.example.nutricare;
+package com.example.nutricare.Login;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -15,6 +15,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.nutricare.MainActivity;
+import com.example.nutricare.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,6 +30,7 @@ public class LoginActivity extends AppCompatActivity implements Response.Listene
     ProgressDialog progressDialog;
     RequestQueue requestQueue;
     JsonObjectRequest jsonObjectRequest;
+    int idUsuario = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +90,7 @@ public class LoginActivity extends AppCompatActivity implements Response.Listene
             usuario.setEmail(jsonObject.optString("email"));
             usuario.setUsername(jsonObject.optString("username"));
             usuario.setPassword(jsonObject.optString("pass"));
+            usuario.setTipo(jsonObject.optInt("tipo"));
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -94,22 +98,26 @@ public class LoginActivity extends AppCompatActivity implements Response.Listene
 
         if(!(usuario.getUsername().isEmpty()) && !(usuario.getPassword().isEmpty()))
         {
-            Toast.makeText(this, "Se logeo ", Toast.LENGTH_SHORT).show();
-            goToActivity(usuario.getIdUsuario());
+            Toast.makeText(this, "Bienvenido!", Toast.LENGTH_SHORT).show();
+            goToActivity(usuario.getIdUsuario(), usuario.getTipo());
         }
         else
-            Toast.makeText(this, "no Se logeo ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
 
     }
 
 
-    public void goToActivity(int id)
+    public void goToActivity(int id, int tipo)
     {
         Intent i = new Intent(this, MainActivity.class);
 
         Bundle b = new Bundle();
         b.putInt("ID_USUARIO", id);
         i.putExtras(b);
+
+        Bundle b2 = new Bundle();
+        b2.putInt("ID_TIPO", tipo);
+        i.putExtras(b2);
 
         startActivity(i);
     }

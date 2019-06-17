@@ -7,7 +7,7 @@
    <LinearLayout
        android:orientation="horizontal"
        android:layout_width="match_parent"
-       android:layout_height="50dp"
+       android:layout_height="58dp"
        android:weightSum="8"
        android:layout_margin="10dp">
 
@@ -23,10 +23,11 @@
            <ImageView
                android:id="@+id/ivImage"
                android:background="@drawable/salad"
-               android:layout_width="40dp"
-               android:layout_height="40dp"/>
+               android:layout_width="45dp"
+               android:layout_height="45dp"/>
 
        </LinearLayout>
+
 
        <LinearLayout
            android:layout_weight="2"
@@ -36,7 +37,78 @@
            android:layout_marginLeft="7dp"
            android:gravity="center">
 
-           <TextView
+           <!--First -->
+           <LinearLayout
+               android:orientation="horizontal"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:layout_weight=".5">
+
+               <TextView
+                   android:id="@+id/tvNombre"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Manzana"
+                   android:textStyle="bold"/>
+
+           </LinearLayout>
+
+
+           <!--Second -->
+           <LinearLayout
+               android:orientation="horizontal"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:layout_weight="5.5">
+
+               <!-- 1st row -->
+               <LinearLayout
+                   android:orientation="vertical"
+                   android:layout_width="wrap_content"
+                   android:layout_height="match_parent"
+                   android:layout_weight="1">
+
+                   <TextView
+                       android:id="@+id/tvCalorias"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:text="Cal (cal.): "/>
+
+                   <TextView
+                       android:id="@+id/tvCarbohidratos"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:text="Carb (g.):"/>
+
+
+               </LinearLayout>
+
+               <!-- 2nd row -->
+               <LinearLayout
+                   android:orientation="vertical"
+                   android:layout_width="wrap_content"
+                   android:layout_height="match_parent"
+                   android:layout_weight="1">
+
+
+                   <TextView
+                       android:id="@+id/tvGrasas"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:text="Grasas (g.):"/>
+
+                   <TextView
+                       android:id="@+id/tvProteinas"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:text="Prot.     (g.):"/>
+               </LinearLayout>
+
+           </LinearLayout>
+
+
+
+           <!--<TextView
                android:id="@+id/tvNombre"
                android:layout_width="match_parent"
                android:layout_height="wrap_content"
@@ -53,7 +125,7 @@
                android:id="@+id/tvInfo"
                android:layout_width="match_parent"
                android:layout_height="wrap_content"
-               android:text="Fruta muy rica!"/>
+               android:text="Fruta muy rica!"/>-->
 
        </LinearLayout>
 

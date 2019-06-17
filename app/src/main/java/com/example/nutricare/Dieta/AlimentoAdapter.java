@@ -1,4 +1,4 @@
-package com.example.nutricare;
+package com.example.nutricare.Dieta;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.example.nutricare.R;
 
 import java.util.List;
 
@@ -35,8 +37,10 @@ public class AlimentoAdapter extends RecyclerView.Adapter<AlimentoAdapter.Alimen
     public void onBindViewHolder(@NonNull AlimentoAdapter.AlimentoHolder holder, int i) {
 
         holder.tvNombre.setText(listaAlimento.get(i).getNombre().toString());
-        holder.tvTipo.setText(listaAlimento.get(i).getTipo()+"");
-        holder.tvInfo.setText(listaAlimento.get(i).getInfo().toString());
+        holder.tvCarbo.setText("Carb (g.):"+listaAlimento.get(i).getCarbohidratos()+"");
+        holder.tvCalo.setText("Cal (cal.): "+listaAlimento.get(i).getCalorias()+"");
+        holder.tvProte.setText("Prot.     (g.):"+listaAlimento.get(i).getProteinas()+"");
+        holder.tvGrasas.setText("Grasas (g.):"+listaAlimento.get(i).getGrasas()+"");
         if(listaAlimento.get(i).getTipo()==1)
             holder.ivImage.setImageResource(R.drawable.salad);
         else
@@ -50,15 +54,17 @@ public class AlimentoAdapter extends RecyclerView.Adapter<AlimentoAdapter.Alimen
 
     public class AlimentoHolder extends RecyclerView.ViewHolder {
 
-        TextView tvNombre,tvInfo,tvTipo;
+        TextView tvNombre,tvCarbo, tvGrasas, tvCalo, tvProte;
         ImageView ivImage;
 
         public AlimentoHolder(@NonNull View itemView) {
             super(itemView);
 
             tvNombre= (TextView) itemView.findViewById(R.id.tvNombre);
-            tvInfo= (TextView) itemView.findViewById(R.id.tvInfo);
-            tvTipo= (TextView) itemView.findViewById(R.id.tvTipo);
+            tvCalo = itemView.findViewById(R.id.tvCalorias);
+            tvGrasas = itemView.findViewById(R.id.tvGrasas);
+            tvProte = itemView.findViewById(R.id.tvProteinas);
+            tvCarbo = itemView.findViewById(R.id.tvCarbohidratos);
             ivImage = itemView.findViewById(R.id.ivImage);
         }
     }

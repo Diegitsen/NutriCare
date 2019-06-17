@@ -1,4 +1,4 @@
-package com.example.nutricare;
+package com.example.nutricare.Login;
 
 public class Usuario
 {
@@ -8,6 +8,7 @@ public class Usuario
     String email;
     String username;
     String password;
+    int tipo;
 
     public int getIdUsuario() {
         return idUsuario;
@@ -55,5 +56,13 @@ public class Usuario
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public int getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(int tipo) {
+        this.tipo = tipo;
     }
 }

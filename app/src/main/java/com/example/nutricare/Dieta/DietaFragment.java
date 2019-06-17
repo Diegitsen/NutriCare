@@ -1,4 +1,4 @@
-package com.example.nutricare;
+package com.example.nutricare.Dieta;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -10,11 +10,9 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -26,6 +24,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.nutricare.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -138,6 +137,10 @@ public class DietaFragment extends Fragment implements Response.Listener<JSONObj
         View mView = getLayoutInflater().inflate(R.layout.dialog_agregar_alimento, null);
         final EditText aNombre = (EditText) mView.findViewById(R.id.etNombre);
         final EditText aInfo = (EditText) mView.findViewById(R.id.etInfo);
+        final EditText aCarbohidratos = (EditText) mView.findViewById(R.id.etCarbohidratos );
+        final EditText aCalorias = (EditText) mView.findViewById(R.id.etCalorias);
+        final EditText aGrasas = (EditText) mView.findViewById(R.id.etGrasas);
+        final EditText aProteinas = (EditText) mView.findViewById(R.id.etProteinas);
         final RadioButton rbFruta = mView.findViewById(R.id.rbFruta);
         final RadioButton rbVerdura = mView.findViewById(R.id.rbVerdura);
         Button aAgregar = (Button) mView.findViewById(R.id.bAgregar);
@@ -149,11 +152,19 @@ public class DietaFragment extends Fragment implements Response.Listener<JSONObj
             @Override
             public void onClick(View view) {
 
+                String cal = aCalorias.getText().toString();
+                String carb = aCarbohidratos.getText().toString();
+                String grasas = aGrasas.getText().toString();
+                String prot = aProteinas.getText().toString();
                if(rbFruta.isChecked())
-                   cargarWebService2(aNombre.getText().toString(),1 ,aInfo.getText().toString());
+                   cargarWebService2(aNombre.getText().toString(),1 ,aInfo.getText().toString(),
+                          Integer.parseInt(cal), Integer.parseInt(carb), Integer.parseInt(grasas),
+                           Integer.parseInt(prot));
 
                else if(rbVerdura.isChecked())
-                    cargarWebService2(aNombre.getText().toString(),2,aInfo.getText().toString());
+                   cargarWebService2(aNombre.getText().toString(),2 ,aInfo.getText().toString(),
+                           Integer.parseInt(cal), Integer.parseInt(carb), Integer.parseInt(grasas),
+                           Integer.parseInt(prot));
 
                dialog.dismiss();
             }
@@ -174,11 +185,13 @@ public class DietaFragment extends Fragment implements Response.Listener<JSONObj
         request.add(jsonObjectRequest);
     }
 
-    private void cargarWebService2(String nombre, Integer tipo, String info)
+    private void cargarWebService2(String nombre, Integer tipo, String info, int calorias, int carbohidratos,
+                                   int grasas, int proteinas)
     {
         nService = 2;
         String url = "https://nutricareapp.000webhostapp.com/agregarAlimento.php?nombre=" + nombre
-                + "&tipo=" + tipo + "&info=" + info;
+                + "&tipo=" + tipo + "&info=" + info + "&calorias=" + calorias + "&carbohidratos=" + carbohidratos
+                + "&grasas=" + grasas + "&proteinas=" + proteinas;
 
         url = url.replace(" ", "%20");
 
@@ -246,6 +259,10 @@ public class DietaFragment extends Fragment implements Response.Listener<JSONObj
                     alimento.setNombre(jsonObject.optString("nombre"));
                     alimento.setInfo(jsonObject.optString("info"));
                     alimento.setTipo(jsonObject.optInt("tipo"));
+                    alimento.setCarbohidratos(jsonObject.optInt("carbohidratos"));
+                    alimento.setCalorias(jsonObject.optInt("calorias"));
+                    alimento.setGrasas(jsonObject.optInt("grasas"));
+                    alimento.setProteinas(jsonObject.optInt("proteinas"));
 
                     listaAlimentos.add(alimento);
 
