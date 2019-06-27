@@ -1,18 +1,16 @@
-package com.example.nutricare.Estadistica;
+package com.example.nutricare.Dieta;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -21,8 +19,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.nutricare.Dieta.Alimento;
-import com.example.nutricare.Dieta.AlimentoAdapter;
+import com.example.nutricare.Login.Paciente;
 import com.example.nutricare.R;
 
 import org.json.JSONArray;
@@ -31,17 +28,17 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link EstadisticasFragment.OnFragmentInteractionListener} interface
+ * {@link LstaPacientesFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link EstadisticasFragment#newInstance} factory method to
+ * Use the {@link LstaPacientesFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class EstadisticasFragment extends Fragment implements Response.Listener<JSONObject>,
-        Response.ErrorListener{
+public class LstaPacientesFragment extends Fragment implements Response.Listener<JSONObject>,
+        Response.ErrorListener
+{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -54,23 +51,14 @@ public class EstadisticasFragment extends Fragment implements Response.Listener<
     private OnFragmentInteractionListener mListener;
 
     RecyclerView recyclerView;
-    ArrayList<Alimento> listaAlimentos;
-
-    private TextView tvGrasas, tvProteinas, tvCalorias, tvCarbohidratos;
+    ArrayList<Paciente> pacientes;
 
     ProgressDialog progressDialog;
 
     RequestQueue request;
     JsonObjectRequest jsonObjectRequest;
 
-    int sGrasas=0;
-    int sProteinas=0;
-    int sCarbohidratos=0;
-    int sCalorias=0;
-
-    private int nService = 0;
-
-    public EstadisticasFragment() {
+    public LstaPacientesFragment() {
         // Required empty public constructor
     }
 
@@ -80,11 +68,11 @@ public class EstadisticasFragment extends Fragment implements Response.Listener<
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment EstadisticasFragment.
+     * @return A new instance of fragment LstaPacientesFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static EstadisticasFragment newInstance(String param1, String param2) {
-        EstadisticasFragment fragment = new EstadisticasFragment();
+    public static LstaPacientesFragment newInstance(String param1, String param2) {
+        LstaPacientesFragment fragment = new LstaPacientesFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -105,37 +93,29 @@ public class EstadisticasFragment extends Fragment implements Response.Listener<
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View vista = inflater.inflate(R.layout.fragment_estadisticas, container, false);
+        View vista = inflater.inflate(R.layout.fragment_lsta_pacientes, container, false);
 
-        listaAlimentos = new ArrayList<>();
 
-        tvCarbohidratos = vista.findViewById(R.id.tvCarbohidratos);
-        /*tvGrasas = vista.findViewById(R.id.tvGrasas);
-        tvCarbohidratos = vista.findViewById(R.id.tvCarbohidratos);
-        tvProteinas = vista.findViewById(R.id.tvProteinas);*/
+        pacientes = new ArrayList<>();
 
-        tvCarbohidratos.setText("Usted ha consumido: " + listaAlimentos.size() + " alimentos");
-        /*tvGrasas.setText(sGrasas);
-        tvCarbohidratos.setText(sCarbohidratos);
-        tvProteinas.setText(sProteinas);*/
+        recyclerView = vista.findViewById(R.id.idRecycler);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
+        recyclerView.setHasFixedSize(true);
 
         request = Volley.newRequestQueue(getContext());
 
         cargarWebService();
 
-        return  vista;
+        return vista;
     }
 
 
     private void cargarWebService()
     {
-        nService = 1;
+        Bundle bundle = getArguments();
+        int id_usuario = bundle.getInt("ID_USUARIO");
 
-        progressDialog = new ProgressDialog(getContext());
-        progressDialog.setMessage("Consultado...");
-        progressDialog.show();
-
-        String url = "https://nutricareapp.000webhostapp.com/consultarDietaHoy.php";
+        String url = "https://nutricareapp.000webhostapp.com/filtrarPacientesPorDoctor.php?idDoctor=" + id_usuario;
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, this, this);
         request.add(jsonObjectRequest);
@@ -168,49 +148,51 @@ public class EstadisticasFragment extends Fragment implements Response.Listener<
     @Override
     public void onErrorResponse(VolleyError error) {
 
+        Toast.makeText(getContext(), "No se pudo conectar" + error.toString(), Toast.LENGTH_SHORT).show();
+        Log.i("ERROR", error.toString());
+
     }
 
     @Override
-    public void onResponse(JSONObject response) {
+    public void onResponse(JSONObject response)
+    {
 
+        Paciente paciente = null;
 
-        Alimento alimento = null;
+        JSONArray json = new JSONArray();
 
-        JSONArray json = response.optJSONArray("Alimento");
+        json = response.optJSONArray("paciente");
 
         try{
             for(int i = 0; i < json.length(); i++)
             {
-                alimento = new Alimento();
+                paciente = new Paciente();
                 JSONObject jsonObject = null;
                 jsonObject = json.getJSONObject(i);
 
-                alimento.setIdAlimento(jsonObject.optInt("idAlimento"));
+                paciente.setIdPaciente(jsonObject.optInt("idPaciente"));
+                paciente.setNombre(jsonObject.optString("nombre"));
+                paciente.setApellido(jsonObject.optString("apellido"));
+                paciente.setPeso(jsonObject.optInt("peso"));
+                paciente.setEdad(jsonObject.optInt("edad"));
 
-                /*sCalorias += alimento.getCalorias();
-                sCarbohidratos += alimento.getCarbohidratos();
-                sProteinas += alimento.getProteinas();
-                sGrasas += alimento.getGrasas();
-*/
-                listaAlimentos.add(alimento);
+                pacientes.add(paciente);
 
             }
-            progressDialog.hide();
-            tvCarbohidratos.setText("Usted ha consumido: " + listaAlimentos.size() + " alimentos");
+
+            PacienteAdapter adapter = new PacienteAdapter(pacientes);
 
 
-            /*AlimentoAdapter adapter = new AlimentoAdapter(listaAlimentos);
-
-            recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
-
-            recyclerView.setAdapter(adapter);*/
+            recyclerView.setAdapter(adapter);
 
         }catch (JSONException e)
         {
             e.printStackTrace();
-            Toast.makeText(getContext(), "No se ha podido conectar con el servidor", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "No se ha podido conectar con el servidor" +
+                    response, Toast.LENGTH_SHORT).show();
             progressDialog.hide();
         }
+
     }
 
     /**
@@ -227,6 +209,4 @@ public class EstadisticasFragment extends Fragment implements Response.Listener<
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
-
-
 }

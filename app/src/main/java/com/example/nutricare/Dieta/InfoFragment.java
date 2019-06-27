@@ -10,16 +10,12 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -34,11 +30,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 
 
 /**
@@ -49,7 +41,7 @@ import java.util.Locale;
  * Use the {@link DietaFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class DietaFragment extends Fragment implements Response.Listener<JSONObject>,
+public class InfoFragment extends Fragment implements Response.Listener<JSONObject>,
         Response.ErrorListener{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -67,23 +59,18 @@ public class DietaFragment extends Fragment implements Response.Listener<JSONObj
 
     RecyclerView recyclerView;
     ArrayList<Alimento> listaAlimentos;
-    ArrayList<String> listaAlimentosString;
 
     ProgressDialog progressDialog;
-
-    String fecha;
 
     RequestQueue request;
     JsonObjectRequest jsonObjectRequest;
 
-    FloatingActionButton bAgregarAlimento, bAgregarDieta;
-
-    int idAlimentoSeleccionado = 0;
+    FloatingActionButton bAgregar;
 
     private int nService = 0;
 
 
-    public DietaFragment() {
+    public InfoFragment() {
         // Required empty public constructor
     }
 
@@ -122,38 +109,23 @@ public class DietaFragment extends Fragment implements Response.Listener<JSONObj
         View v = inflater.inflate(R.layout.fragment_dieta, container, false);
 
         listaAlimentos = new ArrayList<>();
-        listaAlimentosString = new ArrayList<>();
 
         recyclerView = v.findViewById(R.id.idRecycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         recyclerView.setHasFixedSize(true);
-        bAgregarAlimento = v.findViewById(R.id.add_fab);
-        bAgregarDieta = v.findViewById(R.id.add_asignar);
+        bAgregar = v.findViewById(R.id.add_fab);
 
 
         request = Volley.newRequestQueue(getContext());
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        Date date = new Date();
-
-        fecha = dateFormat.format(date);
-
         cargarWebService();
 
-        bAgregarAlimento.setOnClickListener(new View.OnClickListener() {
+        bAgregar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 agregarAlimento();
             }
         });
-
-        bAgregarDieta.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                agregarDieta();
-            }
-        });
-
 
         return v;
     }
@@ -180,58 +152,23 @@ public class DietaFragment extends Fragment implements Response.Listener<JSONObj
             @Override
             public void onClick(View view) {
 
-                if(rbFruta.isChecked() || rbVerdura.isChecked())
-                {
-                    String cal = aCalorias.getText().toString();
-                    String carb = aCarbohidratos.getText().toString();
-                    String grasas = aGrasas.getText().toString();
-                    String prot = aProteinas.getText().toString();
-                    if(rbFruta.isChecked())
-                        cargarWebService2(aNombre.getText().toString(),1 ,aInfo.getText().toString(),
-                                Integer.parseInt(cal), Integer.parseInt(carb), Integer.parseInt(grasas),
-                                Integer.parseInt(prot));
+                String cal = aCalorias.getText().toString();
+                String carb = aCarbohidratos.getText().toString();
+                String grasas = aGrasas.getText().toString();
+                String prot = aProteinas.getText().toString();
+                if(rbFruta.isChecked())
+                    cargarWebService2(aNombre.getText().toString(),1 ,aInfo.getText().toString(),
+                            Integer.parseInt(cal), Integer.parseInt(carb), Integer.parseInt(grasas),
+                            Integer.parseInt(prot));
 
-                    else if(rbVerdura.isChecked())
-                        cargarWebService2(aNombre.getText().toString(),2 ,aInfo.getText().toString(),
-                                Integer.parseInt(cal), Integer.parseInt(carb), Integer.parseInt(grasas),
-                                Integer.parseInt(prot));
+                else if(rbVerdura.isChecked())
+                    cargarWebService2(aNombre.getText().toString(),2 ,aInfo.getText().toString(),
+                            Integer.parseInt(cal), Integer.parseInt(carb), Integer.parseInt(grasas),
+                            Integer.parseInt(prot));
 
-                    dialog.dismiss();
-
-                }
-                else
-                    Toast.makeText(getActivity(), "Selecciona si es fruta o verdura", Toast.LENGTH_SHORT).show();
-
+                dialog.dismiss();
             }
         });
-    }
-
-    private void agregarDieta()
-    {
-
-        Bundle bundle = getArguments();
-        final int id_usuario = bundle.getInt("ID_USUARIO");
-
-        AlertDialog.Builder mBuilder = new AlertDialog.Builder(getActivity());
-        View mView = getLayoutInflater().inflate(R.layout.dialog_agregar_dieta, null);
-        final Spinner sAlimento = (Spinner) mView.findViewById(R.id.sAlimento);
-        Button aAgregar = (Button) mView.findViewById(R.id.bAgregarDieta);
-
-        setUpSpinnerAlimentos(sAlimento);
-
-        mBuilder.setView(mView);
-        final AlertDialog dialog = mBuilder.create();
-        dialog.show();
-        aAgregar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                cargarWebService3(fecha, id_usuario, idAlimentoSeleccionado);
-                Toast.makeText(getActivity(), "Dieta agregada con exito", Toast.LENGTH_SHORT).show();
-
-            }
-        });
-
     }
 
     private void cargarWebService()
@@ -253,12 +190,8 @@ public class DietaFragment extends Fragment implements Response.Listener<JSONObj
     {
         nService = 2;
         String url = "https://nutricareapp.000webhostapp.com/agregarAlimento.php?nombre=" + nombre
-                 + "&info=" + info +  "&tipo=" + tipo +"&calorias=" + calorias + "&carbohidratos=" + carbohidratos
+                + "&tipo=" + tipo + "&info=" + info + "&calorias=" + calorias + "&carbohidratos=" + carbohidratos
                 + "&grasas=" + grasas + "&proteinas=" + proteinas;
-
-
-        //https://nutricareapp.000webhostapp.com/agregarAlimento.php?nombre=Pera
-        // &info=Fruta&tipo=1&calorias=10&carbohidratos=10&grasas=10&proteinas=10
 
         url = url.replace(" ", "%20");
 
@@ -266,19 +199,6 @@ public class DietaFragment extends Fragment implements Response.Listener<JSONObj
         request.add(jsonObjectRequest);
 
     }
-
-    private void cargarWebService3(String fecha, int idPaciente, int idAlimento)
-    {
-        nService = 3;
-
-        String url = "https://nutricareapp.000webhostapp.com/agregarDieta.php?fecha=" + fecha + "&idPaciente=" + idPaciente +"&idAlimento=" + idAlimento;
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, this, this);
-        request.add(jsonObjectRequest);
-
-    }
-
-
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -345,7 +265,6 @@ public class DietaFragment extends Fragment implements Response.Listener<JSONObj
                     alimento.setProteinas(jsonObject.optInt("proteinas"));
 
                     listaAlimentos.add(alimento);
-                    listaAlimentosString.add(alimento.getNombre());
 
                 }
                 progressDialog.hide();
@@ -387,31 +306,6 @@ public class DietaFragment extends Fragment implements Response.Listener<JSONObj
         void onFragmentInteraction(Uri uri);
     }
 
-
-    public void setUpSpinnerAlimentos(final Spinner spinnerAlimentos)
-    {
-        spinnerAlimentos.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                idAlimentoSeleccionado = position+1;//listaAlimentos.get(position).getIdAlimento();
-
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, listaAlimentosString);
-
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        spinnerAlimentos.setAdapter(dataAdapter);
-    }
 
 
 }

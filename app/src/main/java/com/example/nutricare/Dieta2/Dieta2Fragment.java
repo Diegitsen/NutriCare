@@ -1,5 +1,6 @@
 package com.example.nutricare.Dieta2;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
@@ -11,7 +12,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -27,8 +31,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -56,6 +63,8 @@ public class Dieta2Fragment extends Fragment implements Response.Listener<JSONOb
     private LinearLayout linearLayout_checkboxes;
     private final ArrayList<CheckBox> allCb = new ArrayList<>();
     private Button bEnviarDatos;
+    private Button bIngresarAlimento;
+    private TextView tvFecha;
 
     private int nService = 0;
     private List<Integer> listOfIds = new ArrayList<>();
@@ -66,6 +75,9 @@ public class Dieta2Fragment extends Fragment implements Response.Listener<JSONOb
     ProgressDialog progressDialog;
 
     RequestQueue request;
+
+
+    int nAlimentos = 0;
 
     public Dieta2Fragment() {
         // Required empty public constructor
@@ -106,7 +118,39 @@ public class Dieta2Fragment extends Fragment implements Response.Listener<JSONOb
 
         alimentos = new ArrayList<>();
         linearLayout_checkboxes = (LinearLayout) vista.findViewById(R.id.linearLayout_checkboxes);
-        //bEnviarDatos = vista.findViewById(R.id.bSaveData);
+        bEnviarDatos = vista.findViewById(R.id.bSaveData);
+        bIngresarAlimento = vista.findViewById(R.id.bIngresarAlimento);
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        Date date = new Date();
+
+        final String fecha = dateFormat.format(date);
+
+        tvFecha = vista.findViewById(R.id.tvFecha);
+        tvFecha.setText(fecha);
+
+        bEnviarDatos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+
+                for(int i = 0; i < allCb.size(); i++)
+                {
+                    if(allCb.get(i).isChecked())
+                    {
+                       cargarWebService2(fecha, 2, allCb.get(i).getId());
+                    }
+                }
+            }
+        });
+
+        bIngresarAlimento.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                    agregarAlimento();
+            }
+        });
 
 
         request = Volley.newRequestQueue(getContext());
@@ -126,6 +170,46 @@ public class Dieta2Fragment extends Fragment implements Response.Listener<JSONOb
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, this, this);
         request.add(jsonObjectRequest);
+    }
+
+
+
+    private void cargarWebService2(String fecha, int idUsuario, int idAlimento)
+    {
+        nService = 2;
+
+        /*for(int i = 0; i < list.size(); i++)
+        {
+            String url = "https://nutricareapp.000webhostapp.com/insertarDieta.php?fecha=" + fecha + "&idUsuario=" + idUsuario + "&idAlimento=" +  list.get(i) ;
+
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, this, this);
+            request.add(jsonObjectRequest);
+        }*/
+
+
+        String url = "https://nutricareapp.000webhostapp.com/insertarDieta.php?fecha=" + fecha + "&idUsuario=" + idUsuario + "&idAlimento=" +  idAlimento ;
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, this, this);
+        request.add(jsonObjectRequest);
+        //on response yeeeei
+        Toast.makeText(getContext(), "Se ha registrado la dieta correctamente", Toast.LENGTH_SHORT).show();
+
+
+    }
+
+    private void cargarWebService3(String nombre, Integer tipo, String info, int calorias, int carbohidratos,
+                                   int grasas, int proteinas)
+    {
+        nService = 2;
+        String url = "https://nutricareapp.000webhostapp.com/agregarAlimento.php?nombre=" + nombre
+                + "&tipo=" + tipo + "&info=" + info + "&calorias=" + calorias + "&carbohidratos=" + carbohidratos
+                + "&grasas=" + grasas + "&proteinas=" + proteinas;
+
+        url = url.replace(" ", "%20");
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, this, this);
+        request.add(jsonObjectRequest);
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -190,6 +274,7 @@ public class Dieta2Fragment extends Fragment implements Response.Listener<JSONOb
                     allCb.add(cb);
 
                     alimentos.add(alimento);
+                    listOfIds.add(alimento.getIdAlimento());
 
                 }
 
@@ -208,6 +293,47 @@ public class Dieta2Fragment extends Fragment implements Response.Listener<JSONOb
             }
 
         }
+    }
+
+
+    private void agregarAlimento()
+    {
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(getActivity());
+        View mView = getLayoutInflater().inflate(R.layout.dialog_agregar_alimento, null);
+        final EditText aNombre = (EditText) mView.findViewById(R.id.etNombre);
+        final EditText aInfo = (EditText) mView.findViewById(R.id.etInfo);
+        final EditText aCarbohidratos = (EditText) mView.findViewById(R.id.etCarbohidratos );
+        final EditText aCalorias = (EditText) mView.findViewById(R.id.etCalorias);
+        final EditText aGrasas = (EditText) mView.findViewById(R.id.etGrasas);
+        final EditText aProteinas = (EditText) mView.findViewById(R.id.etProteinas);
+        final RadioButton rbFruta = mView.findViewById(R.id.rbFruta);
+        final RadioButton rbVerdura = mView.findViewById(R.id.rbVerdura);
+        Button aAgregar = (Button) mView.findViewById(R.id.bAgregar);
+
+        mBuilder.setView(mView);
+        final AlertDialog dialog = mBuilder.create();
+        dialog.show();
+        aAgregar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                String cal = aCalorias.getText().toString();
+                String carb = aCarbohidratos.getText().toString();
+                String grasas = aGrasas.getText().toString();
+                String prot = aProteinas.getText().toString();
+                if(rbFruta.isChecked())
+                    cargarWebService3(aNombre.getText().toString(),1 ,aInfo.getText().toString(),
+                            Integer.parseInt(cal), Integer.parseInt(carb), Integer.parseInt(grasas),
+                            Integer.parseInt(prot));
+
+                else if(rbVerdura.isChecked())
+                    cargarWebService3(aNombre.getText().toString(),2 ,aInfo.getText().toString(),
+                            Integer.parseInt(cal), Integer.parseInt(carb), Integer.parseInt(grasas),
+                            Integer.parseInt(prot));
+
+                dialog.dismiss();
+            }
+        });
     }
 
     /**

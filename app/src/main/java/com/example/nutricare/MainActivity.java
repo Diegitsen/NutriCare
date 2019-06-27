@@ -11,6 +11,8 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.nutricare.Dieta.DietaFragment;
+import com.example.nutricare.Dieta.InfoFragment;
+import com.example.nutricare.Dieta.LstaPacientesFragment;
 import com.example.nutricare.Dieta2.Dieta2Fragment;
 import com.example.nutricare.Estadistica.EstadisticasFragment;
 import com.example.nutricare.Utils.iFragments;
@@ -35,19 +37,20 @@ public class MainActivity extends AppCompatActivity implements iFragments {
 
         DietaFragment dietaFragment = new DietaFragment();
         Dieta2Fragment dieta2Fragment = new Dieta2Fragment();
+        LstaPacientesFragment lstaPacientesFragment = new LstaPacientesFragment();
 
         Bundle bundle = new Bundle();
         bundle.putInt("ID_USUARIO", idUsuario);
-        dietaFragment.setArguments(bundle);
+        lstaPacientesFragment.setArguments(bundle);
 
         Bundle bundle2 = new Bundle();
         bundle2.putInt("ID_TIPO", idTipo);
-        dietaFragment.setArguments(bundle2);
+        lstaPacientesFragment.setArguments(bundle2);
 
-        Toast.makeText(this, "Bienvenido " + idTipo, Toast.LENGTH_SHORT).show();
+       // Toast.makeText(this, "Bienvenido " + idTipo, Toast.LENGTH_SHORT).show();
 
         if(idTipo==1)
-            getSupportFragmentManager().beginTransaction().add(R.id.container, dietaFragment).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.container, lstaPacientesFragment).commit();
         else if(idTipo==2)
             getSupportFragmentManager().beginTransaction().add(R.id.container, dieta2Fragment).commit();
 
@@ -65,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements iFragments {
             switch (item.getItemId()) {
                 case R.id.navigation_dieta:
                     if(idTipo==1)
-                        frag = new DietaFragment();
+                        frag = new LstaPacientesFragment();
                     else if(idTipo==2)
                         frag = new Dieta2Fragment();
 
@@ -82,6 +85,14 @@ public class MainActivity extends AppCompatActivity implements iFragments {
                     Bundle bundle2 = new Bundle();
                     bundle2.putInt("ID_USUARIO", idUsuario);
                     frag.setArguments(bundle2);
+                    fragmentSeleccionado = true;
+                    break;
+
+                case R.id.navigation_info:
+                    frag = new InfoFragment();
+                    Bundle bundle3 = new Bundle();
+                    bundle3.putInt("ID_USUARIO", idUsuario);
+                    frag.setArguments(bundle3);
                     fragmentSeleccionado = true;
                     break;
             }

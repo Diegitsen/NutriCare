@@ -2,7 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="450dp"
+    android:layout_height="680dp"
     tools:context=".Dieta.DietaFragment">
 
    <!-- <android.support.design.widget.FloatingActionButton
@@ -21,15 +21,36 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/add_fab"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginRight="16dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:layout_gravity="bottom|right"
-        android:src="@drawable/ic_add"/>
+        android:gravity="bottom|right"
+        android:layout_gravity="bottom|right">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/add_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginRight="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_gravity="bottom|right"
+            android:src="@drawable/ic_add"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/add_asignar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginRight="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_gravity="bottom|right"
+            android:src="@drawable/ic_check"/>
+
+    </LinearLayout>
+
 
 </FrameLayout>

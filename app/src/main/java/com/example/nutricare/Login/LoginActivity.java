@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -27,10 +28,12 @@ public class LoginActivity extends AppCompatActivity implements Response.Listene
 
     private EditText etUsuario, etContrasenia;
     Button bLogin;
+    RadioButton rbPaciente, rbDoctor;
     ProgressDialog progressDialog;
     RequestQueue requestQueue;
     JsonObjectRequest jsonObjectRequest;
     int idUsuario = 0;
+    int nservice = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,18 +43,68 @@ public class LoginActivity extends AppCompatActivity implements Response.Listene
         etUsuario = findViewById(R.id.etUsuario);
         etContrasenia = findViewById(R.id.etContrasenia);
         bLogin = findViewById(R.id.bLogin);
+        rbDoctor = findViewById(R.id.rbDoctor);
+        rbPaciente = findViewById(R.id.rbPaciente);
+
+
+        rbPaciente.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                rbDoctor.setChecked(false);
+            }
+        });
+
+        rbDoctor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                rbPaciente.setChecked(false);
+            }
+        });
+
+        bLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(rbPaciente.isChecked())
+                {
+                    cargarWebService();
+                }
+                else if(rbDoctor.isChecked())
+                {
+                    cargarWebService2();
+                }
+            }
+        });
 
         requestQueue = Volley.newRequestQueue(this);
     }
 
-    public void cargarWebService(View v)
+    public void cargarWebService()
     {
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Cargando...");
         progressDialog.show();
 
-        String url = "https://nutricareapp.000webhostapp.com/loginUsuario.php?username=" + etUsuario.getText().toString() +
-                "&pass=" + etContrasenia.getText().toString();
+        nservice = 1;
+
+        String url = "https://nutricareapp.000webhostapp.com/loginPaciente.php?usuario=" + etUsuario.getText().toString() +
+                "&password=" + etContrasenia.getText().toString();
+
+        url = url.replace(" ", "%20");
+
+        jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, this, this);
+        requestQueue.add(jsonObjectRequest);
+    }
+
+    public void cargarWebService2()
+    {
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Cargando...");
+        progressDialog.show();
+
+        nservice = 2;
+
+        String url = "https://nutricareapp.000webhostapp.com/loginDoctor.php?usuario=" + etUsuario.getText().toString() +
+                "&password=" + etContrasenia.getText().toString();
 
         url = url.replace(" ", "%20");
 
@@ -74,35 +127,68 @@ public class LoginActivity extends AppCompatActivity implements Response.Listene
     @Override
     public void onResponse(JSONObject response)
     {
-        progressDialog.hide();
-        //Toast.makeText(getContext(),"Mensaje: " + response, Toast.LENGTH_SHORT).show();
-
-        Usuario usuario = new Usuario();
-
-        JSONArray json = response.optJSONArray("Usuario");
-        JSONObject jsonObject=null;
-
-        try {
-            jsonObject=json.getJSONObject(0);
-            usuario.setIdUsuario(jsonObject.optInt("idUsuario"));
-            usuario.setNombre(jsonObject.optString("nombre"));
-            usuario.setApellido(jsonObject.optString("apellido"));
-            usuario.setEmail(jsonObject.optString("email"));
-            usuario.setUsername(jsonObject.optString("username"));
-            usuario.setPassword(jsonObject.optString("pass"));
-            usuario.setTipo(jsonObject.optInt("tipo"));
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        if(!(usuario.getUsername().isEmpty()) && !(usuario.getPassword().isEmpty()))
+        if(nservice==1)
         {
-            Toast.makeText(this, "Bienvenido!", Toast.LENGTH_SHORT).show();
-            goToActivity(usuario.getIdUsuario(), usuario.getTipo());
+            progressDialog.hide();
+            //Toast.makeText(getContext(),"Mensaje: " + response, Toast.LENGTH_SHORT).show();
+
+            Paciente paciente = new Paciente();
+
+            JSONArray json = response.optJSONArray("paciente");
+            JSONObject jsonObject=null;
+
+            try {
+                jsonObject=json.getJSONObject(0);
+                paciente.setIdPaciente(jsonObject.optInt("idPaciente"));
+                paciente.setNombre(jsonObject.optString("nombre"));
+                paciente.setApellido(jsonObject.optString("apellido"));
+                paciente.setEmail(jsonObject.optString("email"));
+                paciente.setUsuario(jsonObject.optString("usuario"));
+                paciente.setPassword(jsonObject.optString("password"));
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            if(!(paciente.getUsuario().isEmpty()) && !(paciente.getPassword().isEmpty()))
+            {
+                Toast.makeText(this, "Bienvenido!", Toast.LENGTH_SHORT).show();
+                goToActivity(paciente.getIdPaciente(), 2);
+            }
+            else
+                Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
         }
-        else
-            Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
+        else if(nservice==2)
+        {
+            progressDialog.hide();
+
+            Doctor doctor = new Doctor();
+
+            JSONArray json = response.optJSONArray("doctor");
+            JSONObject jsonObject=null;
+
+            try {
+                jsonObject=json.getJSONObject(0);
+                doctor.setidDoctor(jsonObject.optInt("idDoctor"));
+                doctor.setNombre(jsonObject.optString("nombre"));
+                doctor.setApellido(jsonObject.optString("apellido"));
+                doctor.setEmail(jsonObject.optString("email"));
+                doctor.setUsuario(jsonObject.optString("usuario"));
+                doctor.setPassword(jsonObject.optString("password"));
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            if(!(doctor.getUsuario().isEmpty()) && !(doctor.getPassword().isEmpty()))
+            {
+                Toast.makeText(this, "Bienvenido!", Toast.LENGTH_SHORT).show();
+                goToActivity(doctor.getidDoctor(), 1);
+            }
+            else
+                Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
+        }
+
 
     }
 
