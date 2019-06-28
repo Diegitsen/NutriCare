@@ -108,6 +108,9 @@ public class InfoFragment extends Fragment implements Response.Listener<JSONObje
 
         View v = inflater.inflate(R.layout.fragment_dieta, container, false);
 
+        Bundle bundle = getArguments();
+        final int id_usuario = bundle.getInt("ID_USUARIO");
+
         listaAlimentos = new ArrayList<>();
 
         recyclerView = v.findViewById(R.id.idRecycler);
@@ -118,7 +121,7 @@ public class InfoFragment extends Fragment implements Response.Listener<JSONObje
 
         request = Volley.newRequestQueue(getContext());
 
-        cargarWebService();
+        cargarWebService(id_usuario);
 
         bAgregar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -171,7 +174,7 @@ public class InfoFragment extends Fragment implements Response.Listener<JSONObje
         });
     }
 
-    private void cargarWebService()
+    private void cargarWebService(int idPaciente)
     {
         nService = 1;
 
@@ -179,7 +182,7 @@ public class InfoFragment extends Fragment implements Response.Listener<JSONObje
         progressDialog.setMessage("Consultado...");
         progressDialog.show();
 
-        String url = "https://nutricareapp.000webhostapp.com/consultarAlimentos.php";
+        String url = "https://nutricareapp.000webhostapp.com/consultarAlimentosPorIdPaciente.php?idPaciente=" + idPaciente;
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, this, this);
         request.add(jsonObjectRequest);
@@ -247,7 +250,7 @@ public class InfoFragment extends Fragment implements Response.Listener<JSONObje
         {
             Alimento alimento = null;
 
-            JSONArray json = response.optJSONArray("Alimento");
+            JSONArray json = response.optJSONArray("alimento");
 
             try{
                 for(int i = 0; i < json.length(); i++)

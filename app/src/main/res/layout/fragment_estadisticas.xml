@@ -9,13 +9,22 @@
     android:gravity="center">
 
     <TextView
+        android:id="@+id/tvText"
+        android:padding="12dp"
+        android:textSize="20dp"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Las estadisticas de los alimentos que comiste hoy son:"/>
+
+    <TextView
         android:textSize="20dp"
         android:id="@+id/tvCarbohidratos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="carb"/>
 
-    <!--<TextView
+    <TextView
         android:textSize="20dp"
         android:id="@+id/tvGrasas"
         android:layout_width="wrap_content"
@@ -34,7 +43,28 @@
         android:id="@+id/tvCalorias"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="cal"/>-->
+        android:text="cal"/>
 
+    <LinearLayout
+        android:padding="20dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/bDiario"
+            android:text="Diario"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/bMensual"
+            android:text="Mensual"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
 
 </LinearLayout>

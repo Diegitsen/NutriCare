@@ -15,6 +15,7 @@ import com.example.nutricare.Dieta.InfoFragment;
 import com.example.nutricare.Dieta.LstaPacientesFragment;
 import com.example.nutricare.Dieta2.Dieta2Fragment;
 import com.example.nutricare.Estadistica.EstadisticasFragment;
+import com.example.nutricare.Estadistica.LstaPacientesFragment2;
 import com.example.nutricare.Utils.iFragments;
 
 public class MainActivity extends AppCompatActivity implements iFragments {
@@ -44,8 +45,8 @@ public class MainActivity extends AppCompatActivity implements iFragments {
         lstaPacientesFragment.setArguments(bundle);
 
         Bundle bundle2 = new Bundle();
-        bundle2.putInt("ID_TIPO", idTipo);
-        lstaPacientesFragment.setArguments(bundle2);
+        bundle2.putInt("ID_USUARIO", idUsuario);
+        dieta2Fragment.setArguments(bundle2);
 
        // Toast.makeText(this, "Bienvenido " + idTipo, Toast.LENGTH_SHORT).show();
 
@@ -67,21 +68,26 @@ public class MainActivity extends AppCompatActivity implements iFragments {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_dieta:
-                    if(idTipo==1)
+                    if(idTipo==1) //doctor
                         frag = new LstaPacientesFragment();
-                    else if(idTipo==2)
+                    else if(idTipo==2) //paciente
                         frag = new Dieta2Fragment();
 
                     Bundle bundle = new Bundle();
                     bundle.putInt("ID_USUARIO", idUsuario);
                     frag.setArguments(bundle);
-
                     fragmentSeleccionado = true;
                     break;
 
 
                 case R.id.navigation_estadistica:
                     frag = new EstadisticasFragment();
+
+                    if(idTipo==1)
+                        frag = new LstaPacientesFragment2();
+                    else if(idTipo==2)
+                        frag = new EstadisticasFragment();
+
                     Bundle bundle2 = new Bundle();
                     bundle2.putInt("ID_USUARIO", idUsuario);
                     frag.setArguments(bundle2);

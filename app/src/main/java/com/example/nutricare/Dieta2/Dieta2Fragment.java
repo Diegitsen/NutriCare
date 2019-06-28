@@ -116,6 +116,9 @@ public class Dieta2Fragment extends Fragment implements Response.Listener<JSONOb
         // Inflate the layout for this fragment
         View vista =  inflater.inflate(R.layout.fragment_dieta2, container, false);
 
+        Bundle bundle = getArguments();
+        final int id_usuario = bundle.getInt("ID_USUARIO");
+
         alimentos = new ArrayList<>();
         linearLayout_checkboxes = (LinearLayout) vista.findViewById(R.id.linearLayout_checkboxes);
         bEnviarDatos = vista.findViewById(R.id.bSaveData);
@@ -139,7 +142,7 @@ public class Dieta2Fragment extends Fragment implements Response.Listener<JSONOb
                 {
                     if(allCb.get(i).isChecked())
                     {
-                       cargarWebService2(fecha, 2, allCb.get(i).getId());
+                       cargarWebService2(fecha, id_usuario, allCb.get(i).getId());
                     }
                 }
             }
@@ -155,46 +158,36 @@ public class Dieta2Fragment extends Fragment implements Response.Listener<JSONOb
 
         request = Volley.newRequestQueue(getContext());
 
-        cargarWebService();
-
-
+        cargarWebService(id_usuario);
 
         return vista;
     }
 
-    private void cargarWebService()
+    private void cargarWebService(int idPaciente)
     {
         nService = 1;
 
-        String url = "https://nutricareapp.000webhostapp.com/consultarAlimentos.php";
+        progressDialog = new ProgressDialog(getContext());
+        progressDialog.setMessage("Consultado...");
+        progressDialog.show();
+
+        String url = "https://nutricareapp.000webhostapp.com/consultarAlimentosPorIdPaciente.php?idPaciente=" + idPaciente;
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, this, this);
         request.add(jsonObjectRequest);
     }
 
 
-
-    private void cargarWebService2(String fecha, int idUsuario, int idAlimento)
+    private void cargarWebService2(String fecha, int idPaciente, int idAlimento)
     {
         nService = 2;
 
-        /*for(int i = 0; i < list.size(); i++)
-        {
-            String url = "https://nutricareapp.000webhostapp.com/insertarDieta.php?fecha=" + fecha + "&idUsuario=" + idUsuario + "&idAlimento=" +  list.get(i) ;
-
-            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, this, this);
-            request.add(jsonObjectRequest);
-        }*/
-
-
-        String url = "https://nutricareapp.000webhostapp.com/insertarDieta.php?fecha=" + fecha + "&idUsuario=" + idUsuario + "&idAlimento=" +  idAlimento ;
+        String url = "https://nutricareapp.000webhostapp.com/actualizarColumnaDieta.php?fecha=" + fecha + "&idPaciente=" + idPaciente + "&idAlimento=" + idAlimento;
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, this, this);
         request.add(jsonObjectRequest);
-        //on response yeeeei
-        Toast.makeText(getContext(), "Se ha registrado la dieta correctamente", Toast.LENGTH_SHORT).show();
 
-
+        Toast.makeText(getActivity(), "Se ha registrado los alimentos correctamente", Toast.LENGTH_SHORT).show();
     }
 
     private void cargarWebService3(String nombre, Integer tipo, String info, int calorias, int carbohidratos,
@@ -249,7 +242,7 @@ public class Dieta2Fragment extends Fragment implements Response.Listener<JSONOb
         {
             Alimento alimento = null;
 
-            JSONArray json = response.optJSONArray("Alimento");
+            JSONArray json = response.optJSONArray("alimento");
 
             try{
                 for(int i = 0; i < json.length(); i++)
@@ -278,6 +271,7 @@ public class Dieta2Fragment extends Fragment implements Response.Listener<JSONOb
 
                 }
 
+                progressDialog.hide();
                 // nAlumnos = alumnos.size();
 
             /*AlumnoAdapter adapter = new AlumnoAdapter(alumnos);

@@ -67,6 +67,7 @@ public class DietaFragment extends Fragment implements Response.Listener<JSONObj
 
     RecyclerView recyclerView;
     ArrayList<Alimento> listaAlimentos;
+    ArrayList<Alimento> listaAlimentosTotal;
     ArrayList<String> listaAlimentosString;
 
     ProgressDialog progressDialog;
@@ -121,7 +122,11 @@ public class DietaFragment extends Fragment implements Response.Listener<JSONObj
 
         View v = inflater.inflate(R.layout.fragment_dieta, container, false);
 
+        Bundle bundle = getArguments();
+        final int id_usuario = bundle.getInt("ID_USUARIO");
+
         listaAlimentos = new ArrayList<>();
+        listaAlimentosTotal = new ArrayList<>();
         listaAlimentosString = new ArrayList<>();
 
         recyclerView = v.findViewById(R.id.idRecycler);
@@ -138,7 +143,9 @@ public class DietaFragment extends Fragment implements Response.Listener<JSONObj
 
         fecha = dateFormat.format(date);
 
-        cargarWebService();
+        //cargarWebService4();
+
+        cargarWebService(id_usuario);
 
         bAgregarAlimento.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -234,7 +241,7 @@ public class DietaFragment extends Fragment implements Response.Listener<JSONObj
 
     }
 
-    private void cargarWebService()
+    private void cargarWebService(int idPaciente)
     {
         nService = 1;
 
@@ -242,7 +249,7 @@ public class DietaFragment extends Fragment implements Response.Listener<JSONObj
         progressDialog.setMessage("Consultado...");
         progressDialog.show();
 
-        String url = "https://nutricareapp.000webhostapp.com/consultarAlimentos.php";
+        String url = "https://nutricareapp.000webhostapp.com/consultarAlimentosPorIdPaciente.php?idPaciente=" + idPaciente;
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, this, this);
         request.add(jsonObjectRequest);
@@ -278,6 +285,17 @@ public class DietaFragment extends Fragment implements Response.Listener<JSONObj
 
     }
 
+
+    private void cargarWebService4()
+    {
+        nService = 4;
+
+
+        String url = "https://nutricareapp.000webhostapp.com/consultarAlimentos.php";
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, this, this);
+        request.add(jsonObjectRequest);
+    }
 
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -327,7 +345,7 @@ public class DietaFragment extends Fragment implements Response.Listener<JSONObj
         {
             Alimento alimento = null;
 
-            JSONArray json = response.optJSONArray("Alimento");
+            JSONArray json = response.optJSONArray("alimento");
 
             try{
                 for(int i = 0; i < json.length(); i++)
@@ -336,6 +354,7 @@ public class DietaFragment extends Fragment implements Response.Listener<JSONObj
                     JSONObject jsonObject = null;
                     jsonObject = json.getJSONObject(i);
 
+                    alimento.setIdAlimento(jsonObject.optInt("idAlimento"));
                     alimento.setNombre(jsonObject.optString("nombre"));
                     alimento.setInfo(jsonObject.optString("info"));
                     alimento.setTipo(jsonObject.optInt("tipo"));
@@ -345,7 +364,7 @@ public class DietaFragment extends Fragment implements Response.Listener<JSONObj
                     alimento.setProteinas(jsonObject.optInt("proteinas"));
 
                     listaAlimentos.add(alimento);
-                    listaAlimentosString.add(alimento.getNombre());
+                    //listaAlimentosString.add(alimento.getNombre());
 
                 }
                 progressDialog.hide();
@@ -367,6 +386,47 @@ public class DietaFragment extends Fragment implements Response.Listener<JSONObj
         {
             progressDialog.hide();
             Toast.makeText(getActivity(), "Se ha agregado exitosamente", Toast.LENGTH_SHORT).show();
+        }
+        else if(nService == 4)
+        {
+            Alimento alimento = null;
+
+            JSONArray json = response.optJSONArray("Alimento");
+
+            try{
+                for(int i = 0; i < json.length(); i++)
+                {
+                    alimento = new Alimento();
+                    JSONObject jsonObject = null;
+                    jsonObject = json.getJSONObject(i);
+
+                    alimento.setIdAlimento(jsonObject.optInt("idAlimento"));
+                    alimento.setNombre(jsonObject.optString("nombre"));
+                    alimento.setInfo(jsonObject.optString("info"));
+                    alimento.setTipo(jsonObject.optInt("tipo"));
+                    alimento.setCarbohidratos(jsonObject.optInt("carbohidratos"));
+                    alimento.setCalorias(jsonObject.optInt("calorias"));
+                    alimento.setGrasas(jsonObject.optInt("grasas"));
+                    alimento.setProteinas(jsonObject.optInt("proteinas"));
+
+                    listaAlimentosTotal.add(alimento);
+                    listaAlimentosString.add(alimento.getNombre());
+
+                }
+               // progressDialog.hide();
+
+                AlimentoAdapter adapter = new AlimentoAdapter(listaAlimentosTotal);
+
+                recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
+
+                recyclerView.setAdapter(adapter);
+
+            }catch (JSONException e)
+            {
+                e.printStackTrace();
+                Toast.makeText(getContext(), "No se ha podido conectar con el servidor", Toast.LENGTH_SHORT).show();
+                progressDialog.hide();
+            }
         }
 
 
@@ -405,8 +465,16 @@ public class DietaFragment extends Fragment implements Response.Listener<JSONObj
             }
         });
 
+        List<String> alimentos  = new ArrayList<String>();
+        alimentos.add("Manzana");
+        alimentos.add("Tomate");
+        alimentos.add("Pera");
+        alimentos.add("uva");
+        alimentos.add("limon");
+        alimentos.add("fresa");
+        alimentos.add("naranja");
 
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, listaAlimentosString);
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, alimentos);
 
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 

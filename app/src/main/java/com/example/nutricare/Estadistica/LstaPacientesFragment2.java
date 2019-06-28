@@ -1,4 +1,4 @@
-package com.example.nutricare.Dieta;
+package com.example.nutricare.Estadistica;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -20,6 +20,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.nutricare.Dieta.PacienteAdapter;
 import com.example.nutricare.Login.Paciente;
 import com.example.nutricare.R;
 
@@ -32,14 +33,13 @@ import java.util.ArrayList;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link LstaPacientesFragment.OnFragmentInteractionListener} interface
+ * {@link LstaPacientesFragment2.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link LstaPacientesFragment#newInstance} factory method to
+ * Use the {@link LstaPacientesFragment2#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class LstaPacientesFragment extends Fragment implements Response.Listener<JSONObject>,
-        Response.ErrorListener
-{
+public class LstaPacientesFragment2 extends Fragment implements Response.Listener<JSONObject>,
+        Response.ErrorListener{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -54,12 +54,13 @@ public class LstaPacientesFragment extends Fragment implements Response.Listener
     RecyclerView recyclerView;
     ArrayList<Paciente> pacientes;
 
+    int id_usuario;
+
     ProgressDialog progressDialog;
 
     RequestQueue request;
-    JsonObjectRequest jsonObjectRequest;
 
-    public LstaPacientesFragment() {
+    public LstaPacientesFragment2() {
         // Required empty public constructor
     }
 
@@ -69,11 +70,11 @@ public class LstaPacientesFragment extends Fragment implements Response.Listener
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment LstaPacientesFragment.
+     * @return A new instance of fragment LstaPacientesFragment2.
      */
     // TODO: Rename and change types and number of parameters
-    public static LstaPacientesFragment newInstance(String param1, String param2) {
-        LstaPacientesFragment fragment = new LstaPacientesFragment();
+    public static LstaPacientesFragment2 newInstance(String param1, String param2) {
+        LstaPacientesFragment2 fragment = new LstaPacientesFragment2();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -94,10 +95,13 @@ public class LstaPacientesFragment extends Fragment implements Response.Listener
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View vista = inflater.inflate(R.layout.fragment_lsta_pacientes, container, false);
-
+        View vista = inflater.inflate(R.layout.fragment_lsta_pacientes_fragment2, container, false);
 
         pacientes = new ArrayList<>();
+
+        Bundle bundle = getArguments();
+         id_usuario = bundle.getInt("ID_USUARIO");
+        Log.e("idfirst", id_usuario+"");
 
         recyclerView = vista.findViewById(R.id.idRecycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
@@ -110,13 +114,9 @@ public class LstaPacientesFragment extends Fragment implements Response.Listener
         return vista;
     }
 
-
     private void cargarWebService()
     {
-        Bundle bundle = getArguments();
-        int id_usuario = bundle.getInt("ID_USUARIO");
 
-        Log.e("idsec", id_usuario+"");
 
         String url = "https://nutricareapp.000webhostapp.com/filtrarPacientesPorDoctor.php?idDoctor=" + id_usuario;
 
@@ -151,15 +151,11 @@ public class LstaPacientesFragment extends Fragment implements Response.Listener
     @Override
     public void onErrorResponse(VolleyError error) {
 
-        Toast.makeText(getContext(), "No se pudo conectar" + error.toString(), Toast.LENGTH_SHORT).show();
-        Log.i("ERROR", error.toString());
-
     }
 
     @Override
     public void onResponse(JSONObject response)
     {
-
         Paciente paciente = null;
 
         JSONArray json = new JSONArray();
@@ -183,7 +179,7 @@ public class LstaPacientesFragment extends Fragment implements Response.Listener
 
             }
 
-            PacienteAdapter adapter = new PacienteAdapter(pacientes);
+            Paciente2Adapter adapter = new Paciente2Adapter(pacientes);
 
             recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
 
@@ -196,6 +192,7 @@ public class LstaPacientesFragment extends Fragment implements Response.Listener
                     response, Toast.LENGTH_SHORT).show();
             progressDialog.hide();
         }
+
 
     }
 
